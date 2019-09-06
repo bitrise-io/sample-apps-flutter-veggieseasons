@@ -391,7 +391,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.flutter.VeggieSeasons;
+				PRODUCT_BUNDLE_IDENTIFIER = io.bitrise.shiptestcross;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "BitriseBot-Wildcard";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -521,7 +521,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.flutter.VeggieSeasons;
+				PRODUCT_BUNDLE_IDENTIFIER = io.bitrise.shiptestcross;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "BitriseBot-Wildcard";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -549,7 +549,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.flutter.VeggieSeasons;
+				PRODUCT_BUNDLE_IDENTIFIER = io.bitrise.shiptestcross;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "BitriseBot-Wildcard";
 				TARGETED_DEVICE_FAMILY = 1;
