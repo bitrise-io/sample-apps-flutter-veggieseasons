@@ -10,7 +10,7 @@ platform :ios do
 
     Dir.chdir("../ios") do
       cocoapods(podfile: "./ios/Podfile")
-      build_app(scheme: "Runner", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"dev.flutter.VeggieSeasons"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Bitrise Bot"})
+      build_app(scheme: "Runner", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"dev.flutter.VeggieSeasons"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Dev Portal Bot Bitrise"})
     end
 
     Dir.chdir("../android") do
