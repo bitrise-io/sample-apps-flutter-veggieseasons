@@ -17,4 +17,8 @@ platform :ios do
       build_android_app(task: "assemble", flavor: "Release", project_dir: "./android", gradle_path: "./gradlew")
     end
   end
+
+  lane :test_fastlane_session do
+    sh("bash", "./test_session.sh")
+  end
 end
