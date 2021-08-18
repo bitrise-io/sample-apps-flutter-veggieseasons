@@ -4,7 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:veggieseasons/data/app_state.dart';
 import 'package:veggieseasons/data/preferences.dart';
 import 'package:veggieseasons/data/veggie.dart';
@@ -31,8 +31,8 @@ class ServingInfoChart extends StatelessWidget {
 
         return Text(
           '$percent% DV',
+          style: CupertinoTheme.of(context).textTheme.textStyle,
           textAlign: TextAlign.end,
-          style: Styles.detailsServingValueText,
         );
       },
     );
@@ -40,9 +40,10 @@ class ServingInfoChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeData = CupertinoTheme.of(context);
     return Column(
       children: [
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
@@ -52,7 +53,7 @@ class ServingInfoChart extends StatelessWidget {
             ),
             child: Text(
               'Serving info',
-              style: Styles.detailsServingHeaderText,
+              style: CupertinoTheme.of(context).textTheme.textStyle,
             ),
           ),
         ),
@@ -70,14 +71,14 @@ class ServingInfoChart extends StatelessWidget {
                       TableCell(
                         child: Text(
                           'Serving size:',
-                          style: Styles.detailsServingLabelText,
+                          style: Styles.detailsServingLabelText(themeData),
                         ),
                       ),
                       TableCell(
                         child: Text(
                           veggie.servingSize,
                           textAlign: TextAlign.end,
-                          style: Styles.detailsServingValueText,
+                          style: CupertinoTheme.of(context).textTheme.textStyle,
                         ),
                       ),
                     ],
@@ -87,14 +88,14 @@ class ServingInfoChart extends StatelessWidget {
                       TableCell(
                         child: Text(
                           'Calories:',
-                          style: Styles.detailsServingLabelText,
+                          style: Styles.detailsServingLabelText(themeData),
                         ),
                       ),
                       TableCell(
                         child: Text(
                           '${veggie.caloriesPerServing} kCal',
+                          style: CupertinoTheme.of(context).textTheme.textStyle,
                           textAlign: TextAlign.end,
-                          style: Styles.detailsServingValueText,
                         ),
                       ),
                     ],
@@ -104,7 +105,7 @@ class ServingInfoChart extends StatelessWidget {
                       TableCell(
                         child: Text(
                           'Vitamin A:',
-                          style: Styles.detailsServingLabelText,
+                          style: Styles.detailsServingLabelText(themeData),
                         ),
                       ),
                       TableCell(
@@ -120,7 +121,7 @@ class ServingInfoChart extends StatelessWidget {
                       TableCell(
                         child: Text(
                           'Vitamin C:',
-                          style: Styles.detailsServingLabelText,
+                          style: Styles.detailsServingLabelText(themeData),
                         ),
                       ),
                       TableCell(
@@ -139,9 +140,9 @@ class ServingInfoChart extends StatelessWidget {
                   future: prefs.desiredCalories,
                   builder: (context, snapshot) {
                     return Text(
-                      'Percent daily values based on a diet of ' +
-                          '${snapshot?.data ?? '2,000'} calories.',
-                      style: Styles.detailsServingNoteText,
+                      'Percent daily values based on a diet of '
+                      '${snapshot?.data ?? '2,000'} calories.',
+                      style: Styles.detailsServingNoteText(themeData),
                     );
                   },
                 ),
@@ -159,10 +160,12 @@ class InfoView extends StatelessWidget {
 
   const InfoView(this.id);
 
+  @override
   Widget build(BuildContext context) {
-    final appState = ScopedModel.of<AppState>(context, rebuildOnChange: true);
-    final prefs = ScopedModel.of<Preferences>(context, rebuildOnChange: true);
+    final appState = Provider.of<AppState>(context);
+    final prefs = Provider.of<Preferences>(context);
     final veggie = appState.getVeggie(id);
+    final themeData = CupertinoTheme.of(context);
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -179,14 +182,14 @@ class InfoView extends StatelessWidget {
                     veggie.categoryName.toUpperCase(),
                     style: (snapshot.hasData &&
                             snapshot.data.contains(veggie.category))
-                        ? Styles.detailsPreferredCategoryText
-                        : Styles.detailsCategoryText,
+                        ? Styles.detailsPreferredCategoryText(themeData)
+                        : themeData.textTheme.textStyle,
                   );
                 },
               ),
-              Spacer(),
+              const Spacer(),
               for (Season season in veggie.seasons) ...[
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Padding(
                   padding: Styles.seasonIconPadding[season],
                   child: Icon(
@@ -198,18 +201,18 @@ class InfoView extends StatelessWidget {
               ],
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             veggie.name,
-            style: Styles.detailsTitleText,
+            style: Styles.detailsTitleText(themeData),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             veggie.shortDescription,
-            style: Styles.detailsDescriptionText,
+            style: CupertinoTheme.of(context).textTheme.textStyle,
           ),
           ServingInfoChart(veggie, prefs),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -219,8 +222,11 @@ class InfoView extends StatelessWidget {
                   appState.setFavorite(id, value);
                 },
               ),
-              SizedBox(width: 8),
-              Text('Save to Garden'),
+              const SizedBox(width: 8),
+              Text(
+                'Save to Garden',
+                style: CupertinoTheme.of(context).textTheme.textStyle,
+              ),
             ],
           ),
         ],
@@ -231,15 +237,43 @@ class InfoView extends StatelessWidget {
 
 class DetailsScreen extends StatefulWidget {
   final int id;
+  final String restorationId;
 
-  DetailsScreen(this.id);
+  const DetailsScreen({this.id, this.restorationId});
+
+  static String show(NavigatorState navigator, int veggieId) {
+    return navigator.restorablePush<void>(_routeBuilder, arguments: veggieId);
+  }
+
+  static Route<void> _routeBuilder(BuildContext context, Object arguments) {
+    final veggieId = arguments as int;
+    return CupertinoPageRoute(
+      builder: (context) =>
+          DetailsScreen(id: veggieId, restorationId: 'details'),
+      fullscreenDialog: true,
+    );
+  }
 
   @override
   _DetailsScreenState createState() => _DetailsScreenState();
 }
 
-class _DetailsScreenState extends State<DetailsScreen> {
-  int _selectedViewIndex = 0;
+class _DetailsScreenState extends State<DetailsScreen> with RestorationMixin {
+  final RestorableInt _selectedViewIndex = RestorableInt(0);
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(_selectedViewIndex, 'tab');
+  }
+
+  @override
+  void dispose() {
+    _selectedViewIndex.dispose();
+    super.dispose();
+  }
 
   Widget _buildHeader(BuildContext context, AppState model) {
     final veggie = model.getVeggie(widget.id);
@@ -273,34 +307,43 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = ScopedModel.of<AppState>(context, rebuildOnChange: true);
+    final appState = Provider.of<AppState>(context);
 
-    return CupertinoPageScaffold(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(context, appState),
-          Expanded(
-            child: ListView(
-              children: [
-                CupertinoSegmentedControl<int>(
-                  children: {
-                    0: Text('Facts & Info'),
-                    1: Text('Trivia'),
-                  },
-                  groupValue: _selectedViewIndex,
-                  onValueChanged: (value) {
-                    setState(() => _selectedViewIndex = value);
-                  },
-                ),
-                _selectedViewIndex == 0
-                    ? InfoView(widget.id)
-                    : TriviaView(widget.id),
-              ],
+    return UnmanagedRestorationScope(
+      bucket: bucket,
+      child: CupertinoPageScaffold(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: ListView(
+                restorationId: 'list',
+                children: [
+                  _buildHeader(context, appState),
+                  const SizedBox(height: 20),
+                  CupertinoSegmentedControl<int>(
+                    children: const {
+                      0: Text(
+                        'Facts & Info',
+                      ),
+                      1: Text(
+                        'Trivia',
+                      )
+                    },
+                    groupValue: _selectedViewIndex.value,
+                    onValueChanged: (value) {
+                      setState(() => _selectedViewIndex.value = value);
+                    },
+                  ),
+                  _selectedViewIndex.value == 0
+                      ? InfoView(widget.id)
+                      : TriviaView(id: widget.id, restorationId: 'trivia'),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -105,7 +105,7 @@ class _PressableCardState extends State<PressableCard> {
 }
 
 class VeggieCard extends StatelessWidget {
-  VeggieCard(this.veggie, this.isInSeason, this.isPreferredCategory);
+  const VeggieCard(this.veggie, this.isInSeason, this.isPreferredCategory);
 
   /// Veggie to be displayed by the card.
   final Veggie veggie;
@@ -117,9 +117,10 @@ class VeggieCard extends StatelessWidget {
   /// Whether [veggie] falls into one of user's preferred [VeggieCategory]s
   final bool isPreferredCategory;
 
-  Widget _buildDetails() {
+  Widget _buildDetails(BuildContext context) {
+    final themeData = CupertinoTheme.of(context);
     return FrostyBackground(
-      color: Color(0x90ffffff),
+      color: const Color(0x90ffffff),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -127,11 +128,11 @@ class VeggieCard extends StatelessWidget {
           children: <Widget>[
             Text(
               veggie.name,
-              style: Styles.cardTitleText,
+              style: Styles.cardTitleText(themeData),
             ),
             Text(
               veggie.shortDescription,
-              style: Styles.cardDescriptionText,
+              style: Styles.cardDescriptionText(themeData),
             ),
           ],
         ),
@@ -142,12 +143,7 @@ class VeggieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PressableCard(
-      onPressed: () {
-        Navigator.of(context).push<void>(CupertinoPageRoute(
-          builder: (context) => DetailsScreen(veggie.id),
-          fullscreenDialog: true,
-        ));
-      },
+      onPressed: () => DetailsScreen.show(Navigator.of(context), veggie.id),
       child: Stack(
         children: [
           Semantics(
@@ -170,7 +166,7 @@ class VeggieCard extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: _buildDetails(),
+            child: _buildDetails(context),
           ),
         ],
       ),

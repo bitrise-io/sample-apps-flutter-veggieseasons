@@ -21,18 +21,14 @@ class SettingsGroupHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: 15,
         right: 15,
         bottom: 6,
       ),
       child: Text(
         title.toUpperCase(),
-        style: TextStyle(
-          color: CupertinoColors.inactiveGray,
-          fontSize: 13.5,
-          letterSpacing: -0.5,
-        ),
+        style: Styles.settingsGroupHeaderText(CupertinoTheme.of(context)),
       ),
     );
   }
@@ -46,19 +42,13 @@ class SettingsGroupFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: 15,
         right: 15,
         top: 7.5,
       ),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Styles.settingsGroupSubtitle,
-          fontSize: 13,
-          letterSpacing: -0.08,
-        ),
-      ),
+      child: Text(title,
+          style: Styles.settingsGroupFooterText(CupertinoTheme.of(context))),
     );
   }
 }
@@ -74,14 +64,13 @@ class SettingsGroup extends StatelessWidget {
   final List<SettingsItem> items;
   final Widget header;
   final Widget footer;
-
   @override
   Widget build(BuildContext context) {
+    var brightness = CupertinoTheme.brightnessOf(context);
     final dividedItems = <Widget>[items[0]];
-
-    for (int i = 1; i < items.length; i++) {
+    for (var i = 1; i < items.length; i++) {
       dividedItems.add(Container(
-        color: Styles.settingsLineation,
+        color: Styles.settingsLineation(brightness),
         height: 0.3,
       ));
       dividedItems.add(items[i]);
@@ -99,12 +88,12 @@ class SettingsGroup extends StatelessWidget {
             decoration: BoxDecoration(
               color: CupertinoColors.white,
               border: Border(
-                top: const BorderSide(
-                  color: Styles.settingsLineation,
+                top: BorderSide(
+                  color: Styles.settingsLineation(brightness),
                   width: 0,
                 ),
-                bottom: const BorderSide(
-                  color: Styles.settingsLineation,
+                bottom: BorderSide(
+                  color: Styles.settingsLineation(brightness),
                   width: 0,
                 ),
               ),

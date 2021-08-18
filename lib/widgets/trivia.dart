@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:veggieseasons/data/app_state.dart';
 import 'package:veggieseasons/data/veggie.dart';
 import 'package:veggieseasons/styles.dart';
@@ -9,8 +9,9 @@ import 'package:veggieseasons/styles.dart';
 /// the user's score.
 class TriviaView extends StatefulWidget {
   final int id;
+  final String restorationId;
 
-  const TriviaView(this.id);
+  const TriviaView({this.id, this.restorationId});
 
   @override
   _TriviaViewState createState() => _TriviaViewState();
@@ -23,7 +24,7 @@ enum PlayerStatus {
   wasIncorrect,
 }
 
-class _TriviaViewState extends State<TriviaView> {
+class _TriviaViewState extends State<TriviaView> with RestorationMixin {
   /// Current app state. This is used to fetch veggie data.
   AppState appState;
 
@@ -31,16 +32,27 @@ class _TriviaViewState extends State<TriviaView> {
   Veggie veggie;
 
   /// Index of the current trivia question.
-  int triviaIndex = 0;
+  RestorableInt triviaIndex = RestorableInt(0);
 
   /// User's score on the current veggie.
-  int score = 0;
+  RestorableInt score = RestorableInt(0);
 
   /// Trivia question currently being displayed.
-  Trivia get currentTrivia => veggie.trivia[triviaIndex];
+  Trivia get currentTrivia => veggie.trivia[triviaIndex.value];
 
   /// The current state of the game.
-  PlayerStatus status = PlayerStatus.readyToAnswer;
+  _RestorablePlayerStatus status =
+      _RestorablePlayerStatus(PlayerStatus.readyToAnswer);
+
+  @override
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(triviaIndex, 'index');
+    registerForRestoration(score, 'score');
+    registerForRestoration(status, 'status');
+  }
 
   // Called at init and again if any dependencies (read: InheritedWidgets) on
   // on which this object relies are changed.
@@ -48,8 +60,7 @@ class _TriviaViewState extends State<TriviaView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final newAppState =
-        ScopedModel.of<AppState>(context, rebuildOnChange: true);
+    final newAppState = Provider.of<AppState>(context);
 
     setState(() {
       appState = newAppState;
@@ -74,10 +85,18 @@ class _TriviaViewState extends State<TriviaView> {
   }
 
   @override
+  void dispose() {
+    triviaIndex.dispose();
+    score.dispose();
+    status.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (triviaIndex >= veggie.trivia.length) {
+    if (triviaIndex.value >= veggie.trivia.length) {
       return _buildFinishedView();
-    } else if (status == PlayerStatus.readyToAnswer) {
+    } else if (status.value == PlayerStatus.readyToAnswer) {
       return _buildQuestionView();
     } else {
       return _buildResultView();
@@ -86,19 +105,19 @@ class _TriviaViewState extends State<TriviaView> {
 
   void _resetGame() {
     setState(() {
-      triviaIndex = 0;
-      score = 0;
-      status = PlayerStatus.readyToAnswer;
+      triviaIndex.value = 0;
+      score.value = 0;
+      status.value = PlayerStatus.readyToAnswer;
     });
   }
 
   void _processAnswer(int answerIndex) {
     setState(() {
       if (answerIndex == currentTrivia.correctAnswerIndex) {
-        status = PlayerStatus.wasCorrect;
-        score++;
+        status.value = PlayerStatus.wasCorrect;
+        score.value++;
       } else {
-        status = PlayerStatus.wasIncorrect;
+        status.value = PlayerStatus.wasIncorrect;
       }
     });
   }
@@ -106,48 +125,41 @@ class _TriviaViewState extends State<TriviaView> {
   // Widget shown when the game is over. It includes the score and a button to
   // restart everything.
   Widget _buildFinishedView() {
+    final themeData = CupertinoTheme.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
         children: [
           Text(
             'All done!',
-            style: Styles.triviaFinishedTitleText,
+            style: Styles.triviaFinishedTitleText(themeData),
           ),
-          SizedBox(height: 16),
-          Text(
-            'You answered',
-            style: Styles.triviaFinishedText,
-          ),
+          const SizedBox(height: 16),
+          Text('You answered', style: themeData.textTheme.textStyle),
           Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '$score',
-                style: Styles.triviaFinishedBigText,
+                '${score.value}',
+                style: Styles.triviaFinishedBigText(themeData),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  ' of ',
-                  style: Styles.triviaFinishedText,
-                ),
+                child: Text(' of ', style: themeData.textTheme.textStyle),
               ),
               Text(
                 '${veggie.trivia.length}',
-                style: Styles.triviaFinishedBigText,
+                style: Styles.triviaFinishedBigText(themeData),
               ),
             ],
           ),
-          Text(
-            'questions correctly!',
-            style: Styles.triviaFinishedText,
-          ),
-          SizedBox(height: 16),
+          Text('questions correctly!', style: themeData.textTheme.textStyle),
+          const SizedBox(height: 16),
           CupertinoButton(
-            child: Text('Try Again'),
+            child: const Text('Try Again'),
             onPressed: () => _resetGame(),
           ),
         ],
@@ -161,9 +173,12 @@ class _TriviaViewState extends State<TriviaView> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          SizedBox(height: 16),
-          Text(currentTrivia.question),
-          SizedBox(height: 32),
+          const SizedBox(height: 16),
+          Text(
+            currentTrivia.question,
+            style: CupertinoTheme.of(context).textTheme.textStyle,
+          ),
+          const SizedBox(height: 32),
           for (int i = 0; i < currentTrivia.answers.length; i++)
             Padding(
               padding: const EdgeInsets.all(8),
@@ -188,19 +203,48 @@ class _TriviaViewState extends State<TriviaView> {
       padding: const EdgeInsets.all(32),
       child: Column(
         children: [
-          Text(status == PlayerStatus.wasCorrect
-              ? 'That\'s right!'
-              : 'Sorry, that wasn\'t the right answer.'),
-          SizedBox(height: 16),
+          Text(
+            status.value == PlayerStatus.wasCorrect
+                ? 'That\'s right!'
+                : 'Sorry, that wasn\'t the right answer.',
+            style: CupertinoTheme.of(context).textTheme.textStyle,
+          ),
+          const SizedBox(height: 16),
           CupertinoButton(
-            child: Text('Next Question'),
+            child: const Text('Next Question'),
             onPressed: () => setState(() {
-              triviaIndex++;
-              status = PlayerStatus.readyToAnswer;
+              triviaIndex.value++;
+              status.value = PlayerStatus.readyToAnswer;
             }),
           ),
         ],
       ),
     );
+  }
+}
+
+class _RestorablePlayerStatus extends RestorableValue<PlayerStatus> {
+  _RestorablePlayerStatus(this._defaultValue);
+
+  final PlayerStatus _defaultValue;
+
+  @override
+  PlayerStatus createDefaultValue() {
+    return _defaultValue;
+  }
+
+  @override
+  PlayerStatus fromPrimitives(Object data) {
+    return PlayerStatus.values[data as int];
+  }
+
+  @override
+  Object toPrimitives() {
+    return value.index;
+  }
+
+  @override
+  void didUpdateValue(PlayerStatus oldValue) {
+    notifyListeners();
   }
 }
