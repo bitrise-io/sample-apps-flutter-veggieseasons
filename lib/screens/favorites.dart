@@ -4,21 +4,25 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:veggieseasons/data/app_state.dart';
 import 'package:veggieseasons/data/veggie.dart';
-import 'package:veggieseasons/styles.dart';
 import 'package:veggieseasons/widgets/veggie_headline.dart';
 
 class FavoritesScreen extends StatelessWidget {
+  const FavoritesScreen({this.restorationId, Key key}) : super(key: key);
+
+  final String restorationId;
+
   @override
   Widget build(BuildContext context) {
     return CupertinoTabView(
+      restorationScopeId: restorationId,
       builder: (context) {
-        final model = ScopedModel.of<AppState>(context, rebuildOnChange: true);
+        final model = Provider.of<AppState>(context);
 
         return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(
+          navigationBar: const CupertinoNavigationBar(
             middle: Text('My Garden'),
           ),
           child: Center(
@@ -27,15 +31,16 @@ class FavoritesScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
                       'You haven\'t added any favorite veggies to your garden yet.',
-                      style: Styles.headlineDescription,
+                      style: CupertinoTheme.of(context).textTheme.textStyle,
                     ),
                   )
                 : ListView(
+                    restorationId: 'list',
                     children: [
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       for (Veggie veggie in model.favoriteVeggies)
                         Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 24),
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                           child: VeggieHeadline(veggie),
                         ),
                     ],

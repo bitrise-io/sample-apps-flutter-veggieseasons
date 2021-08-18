@@ -3,46 +3,54 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:provider/provider.dart';
 import 'package:veggieseasons/data/app_state.dart';
 import 'package:veggieseasons/data/veggie.dart';
-import 'package:veggieseasons/styles.dart';
-import 'package:veggieseasons/widgets/search_bar.dart';
 import 'package:veggieseasons/widgets/veggie_headline.dart';
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({this.restorationId, Key key}) : super(key: key);
+
+  final String restorationId;
+
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  final controller = TextEditingController();
+class _SearchScreenState extends State<SearchScreen> with RestorationMixin {
+  final controller = RestorableTextEditingController();
   final focusNode = FocusNode();
-  String terms = '';
+  String terms;
 
   @override
-  void initState() {
-    super.initState();
+  String get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(controller, 'text');
     controller.addListener(_onTextChanged);
+    terms = controller.value.text;
   }
 
   @override
   void dispose() {
     focusNode.dispose();
+    controller.dispose();
     super.dispose();
   }
 
   void _onTextChanged() {
-    setState(() => terms = controller.text);
+    setState(() => terms = controller.value.text);
   }
 
-  Widget _createSearchBox() {
+  Widget _createSearchBox({bool focus = true}) {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: SearchBar(
-        controller: controller,
-        focusNode: focusNode,
+      child: CupertinoSearchTextField(
+        controller: controller.value,
+        focusNode: focus ? focusNode : null,
       ),
     );
   }
@@ -54,46 +62,62 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             'No veggies matching your search terms were found.',
-            style: Styles.headlineDescription,
+            style: CupertinoTheme.of(context).textTheme.textStyle,
           ),
         ),
       );
     }
 
     return ListView.builder(
-      itemCount: veggies.length,
+      restorationId: 'list',
+      itemCount: veggies.length + 1,
       itemBuilder: (context, i) {
-        return Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, bottom: 24),
-          child: VeggieHeadline(veggies[i]),
-        );
+        if (i == 0) {
+          return Visibility(
+            // This invisible and otherwise unnecessary search box is used to
+            // pad the list entries downward, so none will be underneath the
+            // real search box when the list is at its top scroll position.
+            child: _createSearchBox(focus: false),
+            visible: false,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+          );
+        } else {
+          return Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+            child: VeggieHeadline(veggies[i - 1]),
+          );
+        }
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final model = ScopedModel.of<AppState>(context, rebuildOnChange: true);
+    final model = Provider.of<AppState>(context);
 
-    return CupertinoTabView(
-      builder: (context) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            color: Styles.scaffoldBackground,
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                _createSearchBox(),
-                Expanded(
-                  child: _buildSearchResults(model.searchVeggies(terms)),
-                ),
-              ],
+    return UnmanagedRestorationScope(
+      bucket: bucket,
+      child: CupertinoTabView(
+        restorationScopeId: 'tabview',
+        builder: (context) {
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarBrightness: MediaQuery.platformBrightnessOf(context),
             ),
-          ),
-        );
-      },
+            child: SafeArea(
+              bottom: false,
+              child: Stack(
+                children: [
+                  _buildSearchResults(model.searchVeggies(terms)),
+                  _createSearchBox(),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

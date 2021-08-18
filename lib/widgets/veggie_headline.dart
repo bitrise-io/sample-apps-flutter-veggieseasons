@@ -46,10 +46,10 @@ class VeggieHeadline extends StatelessWidget {
   const VeggieHeadline(this.veggie);
 
   List<Widget> _buildSeasonDots(List<Season> seasons) {
-    List<Widget> widgets = <Widget>[];
+    var widgets = <Widget>[];
 
-    for (Season season in seasons) {
-      widgets.add(SizedBox(width: 4));
+    for (var season in seasons) {
+      widgets.add(const SizedBox(width: 4));
       widgets.add(
         Container(
           height: 10,
@@ -67,11 +67,10 @@ class VeggieHeadline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeData = CupertinoTheme.of(context);
+
     return GestureDetector(
-      onTap: () => Navigator.of(context).push<void>(CupertinoPageRoute(
-        builder: (context) => DetailsScreen(veggie.id),
-        fullscreenDialog: true,
-      )),
+      onTap: () => DetailsScreen.show(Navigator.of(context), veggie.id),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -81,7 +80,7 @@ class VeggieHeadline extends StatelessWidget {
             height: 72,
             width: 72,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Flexible(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -89,13 +88,16 @@ class VeggieHeadline extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(veggie.name, style: Styles.headlineName),
+                    Text(
+                      veggie.name,
+                      style: Styles.headlineName(themeData),
+                    ),
                     ..._buildSeasonDots(veggie.seasons),
                   ],
                 ),
                 Text(
                   veggie.shortDescription,
-                  style: Styles.headlineDescription,
+                  style: themeData.textTheme.textStyle,
                 ),
               ],
             ),

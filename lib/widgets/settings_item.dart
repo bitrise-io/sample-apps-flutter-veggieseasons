@@ -20,7 +20,7 @@ class SettingsNavigationIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
+    return const Icon(
       CupertinoIcons.forward,
       color: Styles.settingsMediumGray,
       size: 21,
@@ -85,9 +85,11 @@ class SettingsItemState extends State<SettingsItem> {
 
   @override
   Widget build(BuildContext context) {
+    var themeData = CupertinoTheme.of(context);
+    var brightness = CupertinoTheme.brightnessOf(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      color: pressed ? Styles.settingsItemPressed : Styles.transparentColor,
+      color: Styles.settingsItemColor(brightness),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
@@ -97,7 +99,7 @@ class SettingsItemState extends State<SettingsItem> {
             });
             await widget.onPress();
             Future.delayed(
-              Duration(milliseconds: 150),
+              const Duration(milliseconds: 150),
               () {
                 setState(() {
                   pressed = false;
@@ -131,21 +133,20 @@ class SettingsItemState extends State<SettingsItem> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            SizedBox(height: 8.5),
-                            Text(widget.label),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 8.5),
+                            Text(widget.label,
+                                style: themeData.textTheme.textStyle),
+                            const SizedBox(height: 4),
                             Text(
                               widget.subtitle,
-                              style: TextStyle(
-                                fontSize: 12,
-                                letterSpacing: -0.2,
-                              ),
+                              style: Styles.settingsItemSubtitleText(themeData),
                             ),
                           ],
                         )
                       : Padding(
-                          padding: EdgeInsets.only(top: 1.5),
-                          child: Text(widget.label),
+                          padding: const EdgeInsets.only(top: 1.5),
+                          child: Text(widget.label,
+                              style: themeData.textTheme.textStyle),
                         ),
                 ),
               ),
