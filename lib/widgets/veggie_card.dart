@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:veggieseasons/data/veggie.dart';
-import 'package:veggieseasons/screens/details.dart';
 import 'package:veggieseasons/styles.dart';
 
 class FrostyBackground extends StatelessWidget {
@@ -14,17 +14,18 @@ class FrostyBackground extends StatelessWidget {
     this.color,
     this.intensity = 25,
     this.child,
+    super.key,
   });
 
-  final Color color;
+  final Color? color;
   final double intensity;
-  final Widget child;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: intensity, sigmaY: intensity),
+        filter: ui.ImageFilter.blur(sigmaX: intensity, sigmaY: intensity),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: color,
@@ -40,23 +41,17 @@ class FrostyBackground extends StatelessWidget {
 /// elevation and invoking an optional [onPressed] callback.
 class PressableCard extends StatefulWidget {
   const PressableCard({
-    @required this.child,
+    required this.child,
     this.borderRadius = const BorderRadius.all(Radius.circular(5)),
     this.upElevation = 2,
     this.downElevation = 0,
     this.shadowColor = CupertinoColors.black,
     this.duration = const Duration(milliseconds: 100),
     this.onPressed,
-    Key key,
-  })  : assert(child != null),
-        assert(borderRadius != null),
-        assert(upElevation != null),
-        assert(downElevation != null),
-        assert(shadowColor != null),
-        assert(duration != null),
-        super(key: key);
+    super.key,
+  });
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   final Widget child;
 
@@ -71,7 +66,7 @@ class PressableCard extends StatefulWidget {
   final Duration duration;
 
   @override
-  _PressableCardState createState() => _PressableCardState();
+  State<PressableCard> createState() => _PressableCardState();
 }
 
 class _PressableCardState extends State<PressableCard> {
@@ -83,7 +78,7 @@ class _PressableCardState extends State<PressableCard> {
       onTap: () {
         setState(() => cardIsDown = false);
         if (widget.onPressed != null) {
-          widget.onPressed();
+          widget.onPressed!();
         }
       },
       onTapDown: (details) => setState(() => cardIsDown = true),
@@ -105,7 +100,8 @@ class _PressableCardState extends State<PressableCard> {
 }
 
 class VeggieCard extends StatelessWidget {
-  const VeggieCard(this.veggie, this.isInSeason, this.isPreferredCategory);
+  const VeggieCard(this.veggie, this.isInSeason, this.isPreferredCategory,
+      {super.key});
 
   /// Veggie to be displayed by the card.
   final Veggie veggie;
@@ -125,7 +121,7 @@ class VeggieCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+          children: [
             Text(
               veggie.name,
               style: Styles.cardTitleText(themeData),
@@ -143,7 +139,12 @@ class VeggieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PressableCard(
-      onPressed: () => DetailsScreen.show(Navigator.of(context), veggie.id),
+      onPressed: () {
+        // GoRouter does not support relative routes,
+        // so navigate to the absolute route.
+        // see https://github.com/flutter/flutter/issues/108177
+        context.go('/list/details/${veggie.id}');
+      },
       child: Stack(
         children: [
           Semantics(

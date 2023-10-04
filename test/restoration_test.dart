@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:veggieseasons/data/app_state.dart';
@@ -16,7 +15,7 @@ void main() {
     AppState.debugCurrentSeason = Season.autumn;
 
     await tester.pumpWidget(
-      RootRestorationScope(
+      const RootRestorationScope(
         restorationId: 'root',
         child: VeggieApp(),
       ),

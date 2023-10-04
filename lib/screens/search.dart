@@ -4,31 +4,30 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:veggieseasons/data/app_state.dart';
 import 'package:veggieseasons/data/veggie.dart';
 import 'package:veggieseasons/widgets/veggie_headline.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({this.restorationId, Key key}) : super(key: key);
+  const SearchScreen({this.restorationId, super.key});
 
-  final String restorationId;
+  final String? restorationId;
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> with RestorationMixin {
   final controller = RestorableTextEditingController();
   final focusNode = FocusNode();
-  String terms;
+  String? terms;
 
   @override
-  String get restorationId => widget.restorationId;
+  String? get restorationId => widget.restorationId;
 
   @override
-  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     registerForRestoration(controller, 'text');
     controller.addListener(_onTextChanged);
     terms = controller.value.text;
@@ -77,11 +76,14 @@ class _SearchScreenState extends State<SearchScreen> with RestorationMixin {
             // This invisible and otherwise unnecessary search box is used to
             // pad the list entries downward, so none will be underneath the
             // real search box when the list is at its top scroll position.
-            child: _createSearchBox(focus: false),
             visible: false,
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
+            // This invisible and otherwise unnecessary search box is used to
+            // pad the list entries downward, so none will be underneath the
+            // real search box when the list is at its top scroll position.
+            child: _createSearchBox(focus: false),
           );
         } else {
           return Padding(

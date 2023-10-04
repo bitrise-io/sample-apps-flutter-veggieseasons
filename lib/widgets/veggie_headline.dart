@@ -3,20 +3,22 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:veggieseasons/data/veggie.dart';
-import 'package:veggieseasons/screens/details.dart';
 import 'package:veggieseasons/styles.dart';
 
 class ZoomClipAssetImage extends StatelessWidget {
-  const ZoomClipAssetImage(
-      {@required this.zoom,
-      this.height,
-      this.width,
-      @required this.imageAsset});
+  const ZoomClipAssetImage({
+    required this.zoom,
+    this.height,
+    this.width,
+    required this.imageAsset,
+    super.key,
+  });
 
   final double zoom;
-  final double height;
-  final double width;
+  final double? height;
+  final double? width;
   final String imageAsset;
 
   @override
@@ -28,8 +30,8 @@ class ZoomClipAssetImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: OverflowBox(
-          maxHeight: height * zoom,
-          maxWidth: width * zoom,
+          maxHeight: height! * zoom,
+          maxWidth: width! * zoom,
           child: Image.asset(
             imageAsset,
             fit: BoxFit.fill,
@@ -43,7 +45,7 @@ class ZoomClipAssetImage extends StatelessWidget {
 class VeggieHeadline extends StatelessWidget {
   final Veggie veggie;
 
-  const VeggieHeadline(this.veggie);
+  const VeggieHeadline(this.veggie, {super.key});
 
   List<Widget> _buildSeasonDots(List<Season> seasons) {
     var widgets = <Widget>[];
@@ -70,7 +72,13 @@ class VeggieHeadline extends StatelessWidget {
     final themeData = CupertinoTheme.of(context);
 
     return GestureDetector(
-      onTap: () => DetailsScreen.show(Navigator.of(context), veggie.id),
+      onTap: () {
+        // GoRouter does not support relative routes,
+        // so navigate to the absolute route, which can be either
+        // `/favorites/details/${veggie.id}` or `/search/details/${veggie.id}`
+        // see https://github.com/flutter/flutter/issues/108177
+        context.go('${GoRouter.of(context).location}/details/${veggie.id}');
+      },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
