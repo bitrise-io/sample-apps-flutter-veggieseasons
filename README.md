@@ -1,5 +1,7 @@
 # Veggie Seasons
 
+Copied from due to  repos size: https://github.com/flutter/samples/tree/main/veggieseasons
+
 An iOS app that shows which fruits and vegetables are currently in season. It
 showcases Flutter's Cupertino package.
 
