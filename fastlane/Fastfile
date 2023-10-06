@@ -11,10 +11,6 @@ platform :ios do
       cocoapods(podfile: "./ios/Podfile")
       build_app(scheme: "Runner", configuration: "Release", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Tooling Bot Bitrise"})
     end
-
-    Dir.chdir("../android") do
-      build_android_app(task: "assemble", flavor: "Release", project_dir: "./android", gradle_path: "./gradlew")
-    end
   end
   
   lane :buildDebug do
@@ -25,10 +21,6 @@ platform :ios do
     Dir.chdir("../ios") do
       cocoapods(podfile: "./ios/Podfile")
       build_app(scheme: "Runner", configuration: "Debug", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Tooling Bot Bitrise"})
-    end
-
-    Dir.chdir("../android") do
-      build_android_app(task: "assemble", flavor: "Debug", project_dir: "./android", gradle_path: "./gradlew")
     end
   end
 
