@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:veggieseasons/data/veggie.dart';
 
@@ -115,7 +114,7 @@ abstract class Styles {
 
   static const appBackground = Color(0xffd0d0d0);
 
-  static Color scaffoldBackground(Brightness brightness) =>
+  static Color? scaffoldBackground(Brightness brightness) =>
       brightness == Brightness.light
           ? CupertinoColors.lightBackgroundGray
           : null;

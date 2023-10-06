@@ -8,7 +8,7 @@
 PRODUCT_NAME = veggieseasons
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = io.bitrise.shiptestcross
+PRODUCT_BUNDLE_IDENTIFIER = io.bitrise.bf.samples.flutter.veggies
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2020 dev.flutter. All rights reserved.
