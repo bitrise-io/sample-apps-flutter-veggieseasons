@@ -9,7 +9,7 @@ platform :ios do
 
     Dir.chdir("../ios") do
       cocoapods(podfile: "./ios/Podfile")
-      build_app(scheme: "Runner", configuration: "Release", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Tooling Bot Bitrise"})
+      build_app(scheme: "Runner", configuration: "Release", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "Apple Development"})
     end
   end
   
@@ -20,7 +20,7 @@ platform :ios do
 
     Dir.chdir("../ios") do
       cocoapods(podfile: "./ios/Podfile")
-      build_app(scheme: "Runner", configuration: "Debug", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "iPhone Developer: Tooling Bot Bitrise"})
+      build_app(scheme: "Runner", configuration: "Debug", workspace: "./ios/Runner.xcworkspace", export_method: "development", export_options: {"provisioningProfiles" => {"io.bitrise.bf.samples.flutter.veggies"=> "BitriseBot-Wildcard"}, "method"=> "development", "signingStyle" => "manual", "signingCertificate"=> "Apple Development"})
     end
   end
 
